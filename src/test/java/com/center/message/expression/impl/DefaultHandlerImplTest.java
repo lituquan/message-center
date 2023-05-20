@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,14 @@ class DefaultHandlerImplTest {
 
     Map param = new HashMap() {{
         put("user", "LiXiaoXiao");
-        put("items", "[{\"name\":\"Monday\"},{\"name\":\"Tuesday\"}]");
+        put("items", Arrays.asList(
+                new HashMap() {{
+                    put("name", "Monday");
+                }},
+                new HashMap() {{
+                    put("name", "Friday");
+                }})
+        );
     }};
 
     @Test
