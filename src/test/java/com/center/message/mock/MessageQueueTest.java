@@ -32,6 +32,7 @@ class MessageQueueTest {
         body.setScene("2");
         body.setEmail("1111@qq.mail");
         body.setParam(new HashMap() {{
+            put("name", "Li");
             put("items", "[{\"name\":\"你好\"}]");
         }});
         messageQueue.sendMessage(body);

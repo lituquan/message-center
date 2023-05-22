@@ -22,9 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 @Slf4j
 @Service
 public class MessagePathServiceImpl implements MessagePathService {
-    FileReader fileReaderJs = new FileReader("template/template.js");
-    FileReader fileReaderGroovy = new FileReader("template/template.groovy");
-    FileReader fileReaderForeach = new FileReader("template/template.foreach");
+    FileReader fileReaderFreeMarker = new FileReader("template/template.ftl");
 
     private ConcurrentMap<String, Map<MessageType, List<MessagePath>>> pathMap = new ConcurrentHashMap() {
         {
@@ -34,16 +32,16 @@ public class MessagePathServiceImpl implements MessagePathService {
             }});
             put("2", new HashMap() {{
                 put(MessageType.EMAIL,
-                        Arrays.asList(MessagePath.builder().title("主题").template(fileReaderJs.readString()).build()));
+                        Arrays.asList(MessagePath.builder().title("主题").template(fileReaderFreeMarker.readString()).build()));
             }});
             put("3", new HashMap() {{
                 put(MessageType.EMAIL,
-                        Arrays.asList(MessagePath.builder().template(fileReaderGroovy.readString()).build()));
+                        Arrays.asList(MessagePath.builder().template(fileReaderFreeMarker.readString()).build()));
             }});
 
             put("4", new HashMap() {{
                 put(MessageType.EMAIL,
-                        Arrays.asList(MessagePath.builder().template(fileReaderForeach.readString()).build()));
+                        Arrays.asList(MessagePath.builder().template(fileReaderFreeMarker.readString()).build()));
             }});
         }
     };
