@@ -8,4 +8,6 @@ public interface MessageLogService {
     void addLog(MessageLog messageLog);
 
     void updateLog(String messageId, SendStatusType success);
+
+    void updateLog(String messageId, SendStatusType exception, String message);
 }

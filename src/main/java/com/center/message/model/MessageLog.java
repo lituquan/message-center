@@ -12,4 +12,5 @@ public class MessageLog {
     private SendStatusType status;
     private String param;
     private String messageId;
+    private String result;
 }

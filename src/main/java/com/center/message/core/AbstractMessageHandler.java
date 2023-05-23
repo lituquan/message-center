@@ -5,7 +5,6 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.center.message.enums.MessageType;
-import com.center.message.enums.SendStatusType;
 import com.center.message.expression.ExpressionHandler;
 import com.center.message.expression.ExpressionHandlerFactory;
 import com.center.message.mock.sender.Sender;
@@ -91,25 +90,18 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
             //2.3不是定时消息，组装参数，调用消息服务发送出去，保存记录
             String sn = UUID.randomUUID().toString();
             path.setMessageId(sn);
-            MessageLog messageLog = new MessageLog();
-            messageLog.setStatus(SendStatusType.SENDING);
-            messageLog.setParam(JSONUtil.toJsonStr(paramMap));
-            messageLog.setMessageId(sn);
-            //2.4保存待发送日志~日志可以用Aop处理
-            messageLogService.addLog(messageLog);
+            path.setParam(paramMap);
             //2.5发送
             sendMessage(path, userList);
         }
     }
 
-    void sendMessage(MessagePath path, List<User> userList) {
+    public void sendMessage(MessagePath path, List<User> userList) {
         Sender sender = SenderFactory.findSender(messageType());
         log.info("sender is:{}", sender.getClass().getName());
         userList.forEach(user -> {
             sender.send(user, path.getTemplate());
         });
-        //更新日志结果~日志可以用Aop处理
-        messageLogService.updateLog(path.getMessageId(), SendStatusType.SUCCESS);
     }
 
     // 处理参数
