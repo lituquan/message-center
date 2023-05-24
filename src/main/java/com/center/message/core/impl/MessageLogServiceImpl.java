@@ -27,4 +27,11 @@ public class MessageLogServiceImpl implements MessageLogService {
     public void updateLog(String messageId, SendStatusType statusType) {
         logMap.get(messageId).setStatus(statusType);
     }
+
+    @Override
+    public void updateLog(String messageId, SendStatusType statusType, String message) {
+        MessageLog messageLog = logMap.get(messageId);
+        messageLog.setStatus(statusType);
+        messageLog.setResult(message);
+    }
 }

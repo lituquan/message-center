@@ -1,0 +1,5 @@
+这里是${user}编程的世界
+#foreach($item in $items)
+[${item.name}](http://www.baidu.com)
+#end
+时间会消逝

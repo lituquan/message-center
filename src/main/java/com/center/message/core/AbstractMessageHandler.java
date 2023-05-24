@@ -5,22 +5,19 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.center.message.enums.MessageType;
-import com.center.message.enums.SendStatusType;
 import com.center.message.expression.ExpressionHandler;
-import com.center.message.expression.impl.DefaultHandlerImpl;
-import com.center.message.expression.impl.ForeachHandlerImpl;
-import com.center.message.expression.impl.GroovyHandlerImpl;
-import com.center.message.expression.impl.JavaScriptHandlerImpl;
-import com.center.message.mock.sender.Sender;
+import com.center.message.expression.ExpressionHandlerFactory;
 import com.center.message.model.*;
-import com.center.message.util.PlaceholderUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,15 +29,9 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
     @Autowired
     private MessageJobService messageJobService;
     @Autowired
-    private MessageLogService messageLogService;
-    /**
-     * 执行顺序:这里可以改成责任链模式
-     */
-    List<ExpressionHandler> expressionHandlers = Arrays.asList(
-            new ForeachHandlerImpl(),
-            new JavaScriptHandlerImpl(),
-            new GroovyHandlerImpl(),
-            new DefaultHandlerImpl());
+    SendClient sendClient;
+    @Autowired
+    ExpressionHandlerFactory expressionHandlerFactory;
 
     @Async("normalThreadPool")
     @Override
@@ -52,7 +43,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
         }
     }
 
-    private void handle(MessageEvent event) {
+    public void handle(MessageEvent event) {
         log.info("start to send {}, event: [{}]", messageType(), JSONUtil.toJsonStr(event));
         MessageBody messageBody = event.getMessageBody();
         //1.1.校验入参
@@ -98,25 +89,11 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
             //2.3不是定时消息，组装参数，调用消息服务发送出去，保存记录
             String sn = UUID.randomUUID().toString();
             path.setMessageId(sn);
-            MessageLog messageLog = new MessageLog();
-            messageLog.setStatus(SendStatusType.SENDING);
-            messageLog.setParam(JSONUtil.toJsonStr(paramMap));
-            messageLog.setMessageId(sn);
-            //2.4保存待发送日志~日志可以用Aop处理
-            messageLogService.addLog(messageLog);
+            path.setParam(paramMap);
+            path.setMessageType(messageType());
             //2.5发送
-            sendMessage(path, userList);
+            sendClient.sendMessage(path, userList);
         }
-    }
-
-    void sendMessage(MessagePath path, List<User> userList) {
-        Sender sender = SenderFactory.findSender(messageType());
-        log.info("sender is:{}", sender.getClass().getName());
-        userList.forEach(user -> {
-            sender.send(user, path.getTemplate());
-        });
-        //更新日志结果~日志可以用Aop处理
-        messageLogService.updateLog(path.getMessageId(), SendStatusType.SUCCESS);
     }
 
     // 处理参数
@@ -153,12 +130,8 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
 
     //替换变量
     protected void handleParam(Map<String, Object> paramMap, MessagePath path) {
-        path.setTitle(PlaceholderUtils.resolvePlaceholders(path.getTitle(), paramMap));
-        String placeholders = path.getTemplate();
-        for (int i = 0; i < expressionHandlers.size(); i++) {
-            ExpressionHandler expressionHandler = expressionHandlers.get(i);
-            placeholders = expressionHandler.execScript(placeholders, paramMap);
-        }
-        path.setTemplate(placeholders);
+        ExpressionHandler expressionHandler = expressionHandlerFactory.getExpressionHandler();
+        path.setTitle(expressionHandler.execScript(path.getTitle(), paramMap));
+        path.setTemplate(expressionHandler.execScript(path.getTemplate(), paramMap));
     }
 }

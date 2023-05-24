@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 /**
  * Author: lituquan
  * Date: 2023/5/20
@@ -22,4 +24,5 @@ public class MessagePath {
     private boolean isCorn; // 是否定时消息
     private String cron;  // 定时规则
     private String messageId;
+    private Map param;
 }
