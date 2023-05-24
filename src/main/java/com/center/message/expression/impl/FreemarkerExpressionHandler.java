@@ -22,6 +22,9 @@ public class FreemarkerExpressionHandler implements ExpressionHandler {
 
     @Override
     public String execScript(String template, Map<String, Object> paramObj) {
+        if (template == null) {
+            return "";
+        }
         try {
             StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
             stringTemplateLoader.putTemplate(TEMPLATE_NAME, template);

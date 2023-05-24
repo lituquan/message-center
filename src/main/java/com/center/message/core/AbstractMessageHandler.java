@@ -7,7 +7,6 @@ import cn.hutool.json.JSONUtil;
 import com.center.message.enums.MessageType;
 import com.center.message.expression.ExpressionHandler;
 import com.center.message.expression.ExpressionHandlerFactory;
-import com.center.message.mock.sender.Sender;
 import com.center.message.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
     @Autowired
     private MessageJobService messageJobService;
     @Autowired
-    private MessageLogService messageLogService;
+    SendClient sendClient;
     @Autowired
     ExpressionHandlerFactory expressionHandlerFactory;
 
@@ -44,7 +43,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
         }
     }
 
-    private void handle(MessageEvent event) {
+    public void handle(MessageEvent event) {
         log.info("start to send {}, event: [{}]", messageType(), JSONUtil.toJsonStr(event));
         MessageBody messageBody = event.getMessageBody();
         //1.1.校验入参
@@ -91,17 +90,10 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
             String sn = UUID.randomUUID().toString();
             path.setMessageId(sn);
             path.setParam(paramMap);
+            path.setMessageType(messageType());
             //2.5发送
-            sendMessage(path, userList);
+            sendClient.sendMessage(path, userList);
         }
-    }
-
-    public void sendMessage(MessagePath path, List<User> userList) {
-        Sender sender = SenderFactory.findSender(messageType());
-        log.info("sender is:{}", sender.getClass().getName());
-        userList.forEach(user -> {
-            sender.send(user, path.getTemplate());
-        });
     }
 
     // 处理参数

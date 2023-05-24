@@ -8,10 +8,8 @@ import com.center.message.model.MessagePath;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -27,9 +25,13 @@ import java.util.Map;
 public class LogAspect {
     private final MessageLogService messageLogService;
 
+    @Pointcut("execution(* com.center.message.core.SendClient.sendMessage(..))")
+    public void pointcut() {
+    }
+
     // add log
-    @Before("execution(* com.center.message.core.AbstractMessageHandler.sendMessage(..))")
-    public void addLog(JoinPoint joinpoint) {
+    @Before("pointcut()")
+    public void before(JoinPoint joinpoint) {
         MessagePath path = getPath(joinpoint);
         Map paramMap = path.getParam();
         String messageId = path.getMessageId();
@@ -43,14 +45,14 @@ public class LogAspect {
     }
 
     // update log
-    @After("execution(* com.center.message.core.AbstractMessageHandler.sendMessage(..))")
-    public void updateLog(JoinPoint joinPoint) {
+    @After("pointcut()")
+    public void after(JoinPoint joinPoint) {
         MessagePath path = getPath(joinPoint);
         messageLogService.updateLog(path.getMessageId(), SendStatusType.SUCCESS);
     }
 
-    @AfterThrowing(value = "execution(* com.center.message.core.AbstractMessageHandler.sendMessage(..))", throwing = "e")
-    public void updateLogThrow(JoinPoint joinPoint, Throwable e) {
+    @AfterThrowing(value = "pointcut()", throwing = "e")
+    public void afterThrowing(JoinPoint joinPoint, Throwable e) {
         MessagePath path = getPath(joinPoint);
         messageLogService.updateLog(path.getMessageId(), SendStatusType.EXCEPTION, e.getMessage());
     }
@@ -64,5 +66,18 @@ public class LogAspect {
             }
         }
         return null;
+    }
+
+    // @Around("pointcut()")
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+        try {
+            before(joinPoint);
+            Object result = joinPoint.proceed();
+            after(joinPoint);
+            return result;
+        } catch (Exception e) {
+            afterThrowing(joinPoint, e);
+            throw e;
+        }
     }
 }
