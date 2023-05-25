@@ -33,7 +33,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
     @Autowired
     ExpressionHandlerFactory expressionHandlerFactory;
 
-    AbstractMessageHandlerChain.Builder builder = new AbstractMessageHandlerChain.Builder();
+    AbstractMessageHandlerChain.Builder<AbstractMessageHandlerChain> builder = new AbstractMessageHandlerChain.Builder();
 
     @PostConstruct
     public void initChains() {
@@ -90,14 +90,12 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
         for (String parameterName : othersMap.keySet()) {
             String value = StringUtils.isEmpty(othersMap.getStr(parameterName)) ? "" : othersMap.getStr(parameterName);
             if (value.startsWith("[")) {
-                String list = parameterName.split("\\.")[0];
-                value = StringUtils.isEmpty(othersMap.getStr(list)) ? "" : othersMap.getStr(list);
                 JSONArray objects = JSONUtil.parseArray(value);
                 List<Map> listMap = JSONUtil.toList(objects, Map.class);
-                paramMap.put(list, listMap);
+                paramMap.put(parameterName, listMap);
                 continue;
             }
-            paramMap.put(parameterName, value);
+            paramMap.put(parameterName, othersMap.get(parameterName));
         }
         return paramMap;
     }
