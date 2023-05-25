@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "name": "json",
+  "version": "1.0.0",
+  "dependencies": {
+  },
+  "list": [
+    {
+      "name": "hello",
+      "remark": "world"
+    }
+  ]
+}

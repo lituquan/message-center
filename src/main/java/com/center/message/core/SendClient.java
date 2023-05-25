@@ -24,8 +24,6 @@ public class SendClient {
     public void sendMessage(MessagePath path, List<User> userList) {
         Sender sender = SenderFactory.findSender(path.getMessageType());
         log.info("sender is:{}", sender.getClass().getName());
-        userList.forEach(user -> {
-            sender.send(user, path.getTemplate());
-        });
+        userList.forEach(user -> sender.send(user, path.getTemplate()));
     }
 }

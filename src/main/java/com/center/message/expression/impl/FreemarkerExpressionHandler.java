@@ -17,8 +17,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class FreemarkerExpressionHandler implements ExpressionHandler {
-    private final Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
-    private final String TEMPLATE_NAME = "template";
+    private final static String TEMPLATE_NAME = "template";
 
     @Override
     public String execScript(String template, Map<String, Object> paramObj) {
@@ -26,9 +25,11 @@ public class FreemarkerExpressionHandler implements ExpressionHandler {
             return "";
         }
         try {
+            Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
             StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
             stringTemplateLoader.putTemplate(TEMPLATE_NAME, template);
             cfg.setTemplateLoader(stringTemplateLoader);
+            cfg.setClassicCompatible(true);
             Template templateProcessor = cfg.getTemplate(TEMPLATE_NAME);
             StringWriter writer = new StringWriter();
             templateProcessor.process(paramObj, writer);

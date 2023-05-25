@@ -24,5 +24,5 @@ public class MessagePath {
     private boolean isCorn; // 是否定时消息
     private String cron;  // 定时规则
     private String messageId;
-    private Map param;
+    private Map<String, Object> param;
 }

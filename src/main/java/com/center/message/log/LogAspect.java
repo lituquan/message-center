@@ -33,7 +33,10 @@ public class LogAspect {
     @Before("pointcut()")
     public void before(JoinPoint joinpoint) {
         MessagePath path = getPath(joinpoint);
-        Map paramMap = path.getParam();
+        if (path == null) {
+            return;
+        }
+        Map<String, Object> paramMap = path.getParam();
         String messageId = path.getMessageId();
         MessageLog messageLog = new MessageLog();
         messageLog.setStatus(SendStatusType.SENDING);
@@ -41,19 +44,24 @@ public class LogAspect {
         messageLog.setMessageId(messageId);
         //2.4保存待发送日志~日志可以用Aop处理
         messageLogService.addLog(messageLog);
-        return;
     }
 
     // update log
     @After("pointcut()")
     public void after(JoinPoint joinPoint) {
         MessagePath path = getPath(joinPoint);
+        if (path == null) {
+            return;
+        }
         messageLogService.updateLog(path.getMessageId(), SendStatusType.SUCCESS);
     }
 
     @AfterThrowing(value = "pointcut()", throwing = "e")
     public void afterThrowing(JoinPoint joinPoint, Throwable e) {
         MessagePath path = getPath(joinPoint);
+        if (path == null) {
+            return;
+        }
         messageLogService.updateLog(path.getMessageId(), SendStatusType.EXCEPTION, e.getMessage());
     }
 

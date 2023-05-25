@@ -24,7 +24,7 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 @Slf4j
 @Component
 public class MessageQueue {
-    private BlockingDeque<String> blockingDeque = new LinkedBlockingDeque();
+    private BlockingDeque<String> blockingDeque = new LinkedBlockingDeque<>();
     @Autowired
     private ApplicationEventPublisher eventPublisher;
     @Autowired
@@ -40,7 +40,7 @@ public class MessageQueue {
         try {
             String body = blockingDeque.take();
             publishMessage(body);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

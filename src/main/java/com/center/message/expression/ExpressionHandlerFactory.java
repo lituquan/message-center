@@ -17,8 +17,8 @@ public class ExpressionHandlerFactory {
 
     public ExpressionHandler getExpressionHandler() {
         try {
-            Class clz = Class.forName(engine);
-            return (ExpressionHandler) SpringUtil.getBean(clz);
+            Class<ExpressionHandler> clz = (Class<ExpressionHandler>) Class.forName(engine);
+            return SpringUtil.getBean(clz);
         } catch (Exception e) {
             e.printStackTrace();
             // 默认使用freemarker
