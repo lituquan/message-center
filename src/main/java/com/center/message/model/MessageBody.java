@@ -26,7 +26,9 @@ public class MessageBody {
     // 消息类型
     private MessageType messageType;
 
-    public void setParam(Map hashMap) {
+    private List<MessagePath> finalPathDtoList;
+
+    public void setParam(Map<String, Object> hashMap) {
         String json = JSONUtil.toJsonStr(hashMap);
         param = JSONUtil.parseObj(json);
     }

@@ -1,5 +1,6 @@
 package com.center.message.core.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.center.message.core.MessageJobService;
 import com.center.message.model.MessageJob;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,6 @@ public class MessageJobServiceImpl implements MessageJobService {
 
     @Override
     public void saveJob(MessageJob job) {
-
+        log.info("job:{}", JSONUtil.toJsonStr(job));
     }
 }
