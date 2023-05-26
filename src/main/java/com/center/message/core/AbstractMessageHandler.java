@@ -1,5 +1,6 @@
 package com.center.message.core;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -47,15 +48,16 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
     @Override
     public void onApplicationEvent(MessageEvent event) {
         try {
-            handle(event);
+            // 这里拷贝一个对象,避免渠道之间影响~因为并发修改了setUsers|setMessageType
+            MessageBody messageBody = BeanUtil.copyProperties(event.getMessageBody(), MessageBody.class);
+            handle(messageBody);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void handle(MessageEvent event) {
-        log.info("start to send {}, event: [{}]", messageType(), JSONUtil.toJsonStr(event));
-        MessageBody messageBody = event.getMessageBody();
+    public void handle(MessageBody messageBody) {
+        log.info("start to send {}, event: [{}]", messageType(), JSONUtil.toJsonStr(messageBody));
         List<User> userList = messageBody.getUsers().stream().filter(this::filter).collect(Collectors.toList());
         messageBody.setUsers(userList);
         messageBody.setMessageType(messageType());
