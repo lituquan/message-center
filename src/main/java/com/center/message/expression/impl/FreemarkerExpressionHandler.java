@@ -6,6 +6,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -23,6 +24,9 @@ public class FreemarkerExpressionHandler implements ExpressionHandler {
     public String execScript(String template, Map<String, Object> paramObj) {
         if (template == null) {
             return "";
+        }
+        if (CollectionUtils.isEmpty(paramObj)) {
+            return template;
         }
         try {
             Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
