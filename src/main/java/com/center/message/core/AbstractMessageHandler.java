@@ -33,7 +33,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
     @Autowired
     ExpressionHandlerFactory expressionHandlerFactory;
 
-    AbstractMessageHandlerChain.Builder<AbstractMessageHandlerChain> builder = new AbstractMessageHandlerChain.Builder();
+    AbstractMessageHandlerChain.Builder builder = new AbstractMessageHandlerChain.Builder();
 
     @PostConstruct
     public void initChains() {

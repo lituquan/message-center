@@ -32,11 +32,11 @@ public abstract class AbstractMessageHandlerChain {
     }
 
     // 构建一个链表
-    public static class Builder<T> {
+    public static class Builder {
         private AbstractMessageHandlerChain head;
         private AbstractMessageHandlerChain tail;
 
-        public Builder<T> addAbstractMessageHandlerChain(AbstractMessageHandlerChain handler) {
+        public Builder addAbstractMessageHandlerChain(AbstractMessageHandlerChain handler) {
             if (this.head == null) {
                 this.head = this.tail = handler;
                 return this;

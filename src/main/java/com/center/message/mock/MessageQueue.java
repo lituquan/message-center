@@ -1,14 +1,15 @@
 package com.center.message.mock;
 
 import cn.hutool.json.JSONUtil;
+import com.center.message.mock.chain.EmailUserHandler;
+import com.center.message.mock.chain.SmsUserHandler;
+import com.center.message.mock.chain.WechatUserHandler;
 import com.center.message.model.MessageBody;
 import com.center.message.model.MessageEvent;
-import com.center.message.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.LinkedList;
@@ -29,6 +30,16 @@ public class MessageQueue {
     private ApplicationEventPublisher eventPublisher;
     @Autowired
     private MockUserService userService;
+
+    AbstractUserHandlerChain.Builder builder = new AbstractUserHandlerChain.Builder();
+
+    @PostConstruct
+    public void init() {
+        builder.addHandler(new SmsUserHandler())
+                .addHandler(new EmailUserHandler())
+                .addHandler(new WechatUserHandler())
+                .build();
+    }
 
     // 模拟客户端调用MQ发送
     public void sendMessage(MessageBody messageBody) {
@@ -77,18 +88,7 @@ public class MessageQueue {
         if (messageBody.getUsers() == null) {
             messageBody.setUsers(new LinkedList<>());
         }
-        if (!StringUtils.isEmpty(messageBody.getPhone())) {
-            User user = userService.findUserByPhone(messageBody.getPhone());
-            messageBody.getUsers().add(user);
-        }
-        if (!StringUtils.isEmpty(messageBody.getEmail())) {
-            User user = userService.findUserByEmail(messageBody.getEmail());
-            messageBody.getUsers().add(user);
-        }
-        if (!StringUtils.isEmpty(messageBody.getWechatId())) {
-            User user = userService.findUserByWechatId(messageBody.getWechatId());
-            messageBody.getUsers().add(user);
-        }
+        builder.build().doHandle(messageBody);
     }
 
     // 模拟MQ保持监听~这里不考虑服务可靠性
