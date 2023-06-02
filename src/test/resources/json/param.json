@@ -3,6 +3,7 @@
   "name": "json",
   "version": "1.0.0",
   "dependencies": {
+    "name": "hello world"
   },
   "list": [
     {

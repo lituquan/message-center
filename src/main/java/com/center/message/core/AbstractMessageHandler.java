@@ -1,8 +1,6 @@
 package com.center.message.core;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.center.message.core.chain.ProhibitionMessageHandlerChainImpl;
 import com.center.message.core.chain.ValidMessageHandlerChainImpl;
@@ -16,10 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -44,7 +40,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
                 .addAbstractMessageHandlerChain(new ValidPathMessageHandlerChainImpl());
     }
 
-    @Async("normalThreadPool")
+    @Async
     @Override
     public void onApplicationEvent(MessageEvent event) {
         try {
@@ -64,7 +60,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
         builder.build().handleAndNext(messageBody);
         for (MessagePath path : messageBody.getFinalPathDtoList()) {
             //2.1获取入参字段，拼装发送消息服务的入参
-            Map<String, Object> paramMap = getParam(messageBody.getParam());
+            Map<String, Object> paramMap = messageBody.getParam();
             handleParam(paramMap, path);
             //2.2是否定时
             if (path.isCorn()) {
@@ -86,22 +82,6 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
         }
     }
 
-    // 处理参数
-    public Map<String, Object> getParam(JSONObject othersMap) {
-        Map<String, Object> paramMap = new HashMap<>(8);
-        for (String parameterName : othersMap.keySet()) {
-            String value = StringUtils.isEmpty(othersMap.getStr(parameterName)) ? "" : othersMap.getStr(parameterName);
-            if (value.startsWith("[")) {
-                JSONArray objects = JSONUtil.parseArray(value);
-                List<Map> listMap = JSONUtil.toList(objects, Map.class);
-                paramMap.put(parameterName, listMap);
-                continue;
-            }
-            paramMap.put(parameterName, othersMap.get(parameterName));
-        }
-        return paramMap;
-    }
-
     protected abstract MessageType messageType();
 
     protected abstract boolean filter(User s);
@@ -113,3 +93,9 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
         path.setTemplate(expressionHandler.execScript(path.getTemplate(), paramMap));
     }
 }
+
+
+
+
+
+

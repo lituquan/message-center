@@ -1,7 +1,5 @@
 package com.center.message.model;
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.center.message.enums.MessageType;
 import lombok.Data;
 
@@ -22,14 +20,9 @@ public class MessageBody {
     // 场景
     private String scene;
     // 参数
-    private JSONObject param;
+    private Map<String, Object> param;
     // 消息类型
     private MessageType messageType;
 
     private List<MessagePath> finalPathDtoList;
-
-    public void setParam(Map<String, Object> hashMap) {
-        String json = JSONUtil.toJsonStr(hashMap);
-        param = JSONUtil.parseObj(json);
-    }
 }

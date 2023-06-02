@@ -2,6 +2,7 @@ package com.center.message.expression.impl;
 
 import cn.hutool.core.io.file.FileReader;
 import com.center.message.expression.ExpressionHandler;
+import com.center.message.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,8 @@ import java.util.Map;
 class DefaultHandlerImplTest {
 
     Map param = new HashMap() {{
-        put("user", "LiXiaoXiao");
+        put("name", "LiXiaoXiao");
+        put("user", new User("liuxiaoxiao", "123456", "2series", "theta"));
         put("items", Arrays.asList(
                 new HashMap() {{
                     put("name", "Monday");
