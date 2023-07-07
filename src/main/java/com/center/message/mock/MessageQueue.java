@@ -4,6 +4,9 @@ import cn.hutool.json.JSONUtil;
 import com.center.message.mock.chain.EmailUserHandler;
 import com.center.message.mock.chain.SmsUserHandler;
 import com.center.message.mock.chain.WechatUserHandler;
+import com.center.message.mock.queue.ADisruptorConsumer;
+import com.center.message.mock.queue.DisruptorQueue;
+import com.center.message.mock.queue.DisruptorQueueFactory;
 import com.center.message.model.MessageBody;
 import com.center.message.model.MessageEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +16,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.LinkedList;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
@@ -24,13 +25,10 @@ import static org.springframework.util.ObjectUtils.isEmpty;
  */
 @Slf4j
 @Component
-public class MessageQueue {
-    private BlockingDeque<String> blockingDeque = new LinkedBlockingDeque<>();
+public class MessageQueue extends ADisruptorConsumer<String> implements Producer {
+    private DisruptorQueue disruptorQueue;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
-    @Autowired
-    private MockUserService userService;
-
     AbstractUserHandlerChain.Builder builder = new AbstractUserHandlerChain.Builder();
 
     @PostConstruct
@@ -39,21 +37,15 @@ public class MessageQueue {
                 .addHandler(new EmailUserHandler())
                 .addHandler(new WechatUserHandler())
                 .build();
+        // 创建一个Disruptor队列操作类对象（RingBuffer大小为4，false表示只有一个生产者）
+        disruptorQueue = DisruptorQueueFactory.getHandleEventsQueue(4,
+                false, this);
     }
 
     // 模拟客户端调用MQ发送
+    @Override
     public void sendMessage(MessageBody messageBody) {
-        blockingDeque.add(JSONUtil.toJsonStr(messageBody));
-    }
-
-    // 模拟MQ接收消息+广播消息
-    private void receiveMessage() {
-        try {
-            String body = blockingDeque.take();
-            publishMessage(body);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        disruptorQueue.add(JSONUtil.toJsonStr(messageBody));
     }
 
     // 这里需要处理消息幂等
@@ -91,14 +83,8 @@ public class MessageQueue {
         builder.build().doHandle(messageBody);
     }
 
-    // 模拟MQ保持监听~这里不考虑服务可靠性
-    // @PostConstruct 会在服务开始启动这个监听
-    @PostConstruct
-    public void startServer() {
-        new Thread(() -> {
-            while (true) {
-                receiveMessage();
-            }
-        }).start();
+    @Override
+    public void consume(String body) {
+        publishMessage(body);
     }
 }
