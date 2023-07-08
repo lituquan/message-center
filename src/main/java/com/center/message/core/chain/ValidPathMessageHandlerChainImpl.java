@@ -5,7 +5,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.center.message.core.AbstractMessageHandlerChain;
 import com.center.message.core.MessagePathService;
 import com.center.message.model.MessageBody;
-import com.center.message.model.MessagePath;
+import com.center.message.model.MessagePathDTO;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class ValidPathMessageHandlerChainImpl extends AbstractMessageHandlerChai
     @Override
     public boolean handleMessage(MessageBody messageBody) {
         //2.获取已开启、可用的场景配置、模板信息
-        List<MessagePath> finalPathDtoList = findSceneAndTemplate(messageBody);
+        List<MessagePathDTO> finalPathDtoList = findSceneAndTemplate(messageBody);
         if (CollectionUtil.isEmpty(finalPathDtoList)) {
             log.info("onApplicationEvent, but this scene is not exist or opened.");
             return false;
@@ -30,7 +30,7 @@ public class ValidPathMessageHandlerChainImpl extends AbstractMessageHandlerChai
     }
 
     // 查找场景+模板~内部定义为path,可以理解为路由
-    private List<MessagePath> findSceneAndTemplate(MessageBody messageBody) {
+    private List<MessagePathDTO> findSceneAndTemplate(MessageBody messageBody) {
         MessagePathService messagePathService = SpringUtil.getBean(MessagePathService.class);
         return messagePathService.findPathBySceneAndType(messageBody);
     }

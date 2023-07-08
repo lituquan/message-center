@@ -44,8 +44,9 @@ public class MessageQueue extends ADisruptorConsumer<String> implements Producer
 
     // 模拟客户端调用MQ发送
     @Override
-    public void sendMessage(MessageBody messageBody) {
+    public Void sendMessage(MessageBody messageBody) {
         disruptorQueue.add(JSONUtil.toJsonStr(messageBody));
+        return null;
     }
 
     // 这里需要处理消息幂等
@@ -57,7 +58,7 @@ public class MessageQueue extends ADisruptorConsumer<String> implements Producer
         }
         //2.校验必填入参
         MessageBody messageBody = JSONUtil.toBean(msg, MessageBody.class);
-        if (isEmpty(messageBody.getScene())) {
+        if (isEmpty(messageBody.getSceneId())) {
             log.warn("parameter messageCode is missing:{}", msg);
             return;
         }

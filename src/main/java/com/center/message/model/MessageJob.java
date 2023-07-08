@@ -17,7 +17,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class MessageJob {
     private Map<String, Object> param;
-    private MessagePath path;
+    private MessagePathDTO path;
     private MessageBody messageBody;
     private String time;
 }

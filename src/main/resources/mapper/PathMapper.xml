@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 此处与接口类地址对应 -->
+<mapper namespace="com.center.message.persistent.PathMapper">
+
+    <select id="findPathBySceneAndType" resultType="com.center.message.model.MessagePathDTO">
+        select p.*,t.title,t.template from message_path p
+        left join message_template t on p.template_id = t.id
+        where p.scene_id = #{sceneId}
+        <if test="messageType!=null">
+            and message_type = #{messageType}
+        </if>
+    </select>
+</mapper>

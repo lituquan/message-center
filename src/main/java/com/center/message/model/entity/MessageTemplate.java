@@ -1,6 +1,6 @@
 package com.center.message.model.entity;
 
-import com.center.message.enums.SendStatusType;
+import com.center.message.enums.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +17,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageLog implements Serializable {
+public class MessageTemplate implements Serializable {
 
 	private static final long serialVersionUID = 931252093589546245L;
 
@@ -26,30 +26,11 @@ public class MessageLog implements Serializable {
 	 */
 	private Date createTime;
 
-	/**
-	 * 状态
-	 */
-	private SendStatusType status;
+	private String title;
 
-	/**
-	 * 消息内容
-	 */
-	private String result;
+	private String template;
 
-	/**
-	 * 更新时间
-	 */
-	private Date updateTime;
+	private MessageType messageType;
 
-	/**
-	 * 消息id
-	 */
-	private String messageId;
-
-	/**
-	 * 参数json
-	 */
-	private String param;
-
-	private Integer pathId;
+	private Integer id;
 }

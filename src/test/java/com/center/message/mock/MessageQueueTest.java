@@ -16,7 +16,7 @@ class MessageQueueTest {
     @Test
     void sendSmsMessage() {
         MessageBody body = new MessageBody();
-        body.setScene("1");
+        body.setSceneId(1);
         body.setPhone("111");
         body.setParam(new HashMap() {{
             put("name", "Tony");
@@ -29,7 +29,7 @@ class MessageQueueTest {
     @Test
     void sendEmailMessage() {
         MessageBody body = new MessageBody();
-        body.setScene("2");
+        body.setSceneId(2);
         body.setEmail("1111@qq.mail");
         body.setParam(new HashMap() {{
             put("name", "Li");

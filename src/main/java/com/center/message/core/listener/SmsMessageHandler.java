@@ -3,6 +3,7 @@ package com.center.message.core.listener;
 import com.center.message.core.AbstractMessageHandler;
 import com.center.message.enums.MessageType;
 import com.center.message.model.User;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
  */
 @Slf4j
 @Service
+@Getter
 public class SmsMessageHandler extends AbstractMessageHandler {
 
     @Override

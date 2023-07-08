@@ -2,7 +2,7 @@ package com.center.message.core;
 
 import com.center.message.log.LogAspect;
 import com.center.message.mock.sender.Sender;
-import com.center.message.model.MessagePath;
+import com.center.message.model.MessagePathDTO;
 import com.center.message.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class SendClient {
 
-    public void sendMessage(MessagePath path, List<User> userList) {
+    public void sendMessage(MessagePathDTO path, List<User> userList) {
         Sender sender = SenderFactory.findSender(path.getMessageType());
         log.info("sender is:{}", sender.getClass().getName());
         userList.forEach(user -> sender.send(user, path.getTemplate()));

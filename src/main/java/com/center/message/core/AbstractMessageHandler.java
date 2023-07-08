@@ -62,7 +62,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
         if (CollectionUtils.isEmpty(messageBody.getFinalPathDtoList())) {
             return;
         }
-        for (MessagePath path : messageBody.getFinalPathDtoList()) {
+        for (MessagePathDTO path : messageBody.getFinalPathDtoList()) {
             //2.1获取入参字段，拼装发送消息服务的入参
             Map<String, Object> paramMap = messageBody.getParam();
             handleParam(paramMap, path);
@@ -91,7 +91,7 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
     protected abstract boolean filter(User s);
 
     //替换变量
-    protected void handleParam(Map<String, Object> paramMap, MessagePath path) {
+    protected void handleParam(Map<String, Object> paramMap, MessagePathDTO path) {
         ExpressionHandler expressionHandler = expressionHandlerFactory.getExpressionHandler();
         path.setTitle(expressionHandler.execScript(path.getTitle(), paramMap));
         path.setTemplate(expressionHandler.execScript(path.getTemplate(), paramMap));

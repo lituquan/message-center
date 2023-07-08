@@ -18,11 +18,11 @@ public class MessageBody {
     // 接收者
     private List<User> users;
     // 场景
-    private String scene;
+    private Integer sceneId;
     // 参数
     private Map<String, Object> param;
     // 消息类型
     private MessageType messageType;
 
-    private List<MessagePath> finalPathDtoList;
+    private List<MessagePathDTO> finalPathDtoList;
 }

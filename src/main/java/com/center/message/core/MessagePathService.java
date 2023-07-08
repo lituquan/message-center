@@ -1,7 +1,9 @@
 package com.center.message.core;
 
 import com.center.message.model.MessageBody;
-import com.center.message.model.MessagePath;
+import com.center.message.model.MessagePathDTO;
+import com.center.message.model.entity.MessagePath;
+import com.center.message.model.entity.MessageTemplate;
 
 import java.util.List;
 
@@ -11,6 +13,12 @@ import java.util.List;
  */
 public interface MessagePathService {
 
-    List<MessagePath> findPathBySceneAndType(MessageBody messageBody);
+    void addScene(String remark);
+
+    void addTemplate(MessageTemplate template);
+
+    void addPath(MessagePath path);
+
+    List<MessagePathDTO> findPathBySceneAndType(MessageBody messageBody);
 
 }
