@@ -3,8 +3,8 @@ package com.center.message.log;
 import cn.hutool.json.JSONUtil;
 import com.center.message.core.MessageLogService;
 import com.center.message.enums.SendStatusType;
-import com.center.message.model.MessageLog;
 import com.center.message.model.MessagePath;
+import com.center.message.model.entity.MessageLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -12,6 +12,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -36,14 +37,20 @@ public class LogAspect {
         if (path == null) {
             return;
         }
+        MessageLog messageLog = genLog(path);
+        messageLogService.addLog(messageLog);
+    }
+
+    private MessageLog genLog(MessagePath path) {
+        MessageLog messageLog = new MessageLog();
         Map<String, Object> paramMap = path.getParam();
         String messageId = path.getMessageId();
-        MessageLog messageLog = new MessageLog();
         messageLog.setStatus(SendStatusType.SENDING);
         messageLog.setParam(JSONUtil.toJsonStr(paramMap));
         messageLog.setMessageId(messageId);
-        //2.4保存待发送日志~日志可以用Aop处理
-        messageLogService.addLog(messageLog);
+        messageLog.setCreateTime(new Date());
+        messageLog.setMessageType(path.getMessageType());
+        return messageLog;
     }
 
     // update log

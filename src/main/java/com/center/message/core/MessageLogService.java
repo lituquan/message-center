@@ -1,7 +1,7 @@
 package com.center.message.core;
 
 import com.center.message.enums.SendStatusType;
-import com.center.message.model.MessageLog;
+import com.center.message.model.entity.MessageLog;
 
 
 public interface MessageLogService {

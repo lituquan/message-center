@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -58,6 +59,9 @@ public abstract class AbstractMessageHandler implements ApplicationListener<Mess
         messageBody.setUsers(userList);
         messageBody.setMessageType(messageType());
         builder.build().handleAndNext(messageBody);
+        if (CollectionUtils.isEmpty(messageBody.getFinalPathDtoList())) {
+            return;
+        }
         for (MessagePath path : messageBody.getFinalPathDtoList()) {
             //2.1获取入参字段，拼装发送消息服务的入参
             Map<String, Object> paramMap = messageBody.getParam();
